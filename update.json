@@ -1,7 +1,15 @@
 {
-  "versionCode": 1105,
-  "versionName": "v1.1.5",
-  "updateLog": "v1.1.5更新:\n1.修复bug\n2.优化更新检测",
-  "apkUrl": "https://gitproxy.glitch.me/https://github.com/qixia69/Czr_QXNB666/releases/download/v1.1.5/_1.1.5.apk",
+  "version": "1.1.5",
+  "versionCode": 2,
+  "downloadUrl": "https://github.com/qixia69/Czr_QXNB666/releases/download/v1.1.5/_1.1.5.apk",
+  "backupUrl": "https://share.feijipan.com/s/ta7Y2e9y",
+  "changelog": [
+    "新增检测更新功能",
+    "菜单栏优化",
+    "网络状态显示优化",
+    "竞速模式与狂暴模式可叠加",
+    "VPN升级为DNS优化引擎",
+    "修复多个严重BUG"
+  ],
   "forceUpdate": false
 }
