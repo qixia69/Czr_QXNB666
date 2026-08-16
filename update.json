@@ -1,15 +1,15 @@
 {
-  "version": "1.1.9",
-  "versionCode": 5,
+  "version": "2.0.0",
+  "versionCode": 6,
   "downloadUrl": "https://github.com/qixia69/Czr_QXNB666/releases/download/v1.1.9/_1.1.9.apk",
   "backupUrl": "https://share.feijipan.com/s/ta7Y2e9y",
   "changelog": [
-    "新增检测更新功能",
-    "菜单栏优化",
-    "网络状态显示优化",
-    "竞速模式与狂暴模式可叠加",
-    "VPN升级为DNS优化引擎",
-    "修复多个严重BUG"
+    "配置区新增「网络加速/优化」并关",
+    "启动 VPN服务+全局网络优化，切后台仍持续生效",
+    "停止 VPN服务和相关优化 ",
+    "菜单新增「导入应用」入口 ",
+    "导入应用页面样式：列表展示：应用图标、应用名称、应用 包名，已添加应用在上方，未添加应用在下方，中间横线隔开 ",
+    "加速模式：后台全局加速，不检测前台应用"
   ],
   "forceUpdate": false
 }
