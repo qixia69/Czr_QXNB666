@@ -1,15 +1,12 @@
 {
-  "version": "2.0.4",
-  "versionCode": 10,
-  "downloadUrl": "https://github.com/qixia69/Czr_QXNB666/releases/download/v2.0.4/_2.0.4.apk",
+  "version": "2.0.5",
+  "versionCode": 11,
+  "downloadUrl": "https://github.com/qixia69/Czr_QXNB666/releases/download/v2.0.5/_2.0.5.apk",
   "backupUrl": "https://share.feijipan.com/s/ta7Y2e9y",
   "changelog": [
-    "配置区新增「网络加速/优化」并关",
-    "启动 VPN服务+全局网络优化，切后台仍持续生效",
-    "停止 VPN服务和相关优化 ",
-    "菜单新增「导入应用」入口 ",
-    "导入应用页面样式：列表展示：应用图标、应用名称、应用 包名，已添加应用在上方，未添加应用在下方，中间横线隔开 ",
-    "加速模式：后台全局加速，不检测前台应用"
+    "七夕祝大家七夕快乐",
+    "活动上线优化",
+    "AI已上线",
   ],
   "forceUpdate": false
 }
