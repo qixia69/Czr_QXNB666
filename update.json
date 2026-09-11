@@ -1,12 +1,12 @@
 {
-  "version": "2.0.5",
-  "versionCode": 11,
-  "downloadUrl": "https://github.com/qixia69/Czr_QXNB666/releases/download/v2.0.5/_2.0.5.apk",
-  "backupUrl": "https://share.feijipan.com/s/ta7Y2e9y",
+  "version": "1.0",
+  "versionCode": 2,
+  "downloadUrl": "https://github.com/qixia69/Czr_QXNB666/releases/download/NexTool/NexTool_1.0_ap_r.apk",
+  "backupUrl": "https://share.feijipan.com/s/8I9Wq8Fm",
   "changelog": [
-    "七夕祝大家七夕快乐",
-    "活动上线优化",
-    "AI已上线",
+    "正式发布",
+    "修改检测更新逻辑",
+    "参数明天更新",
   ],
   "forceUpdate": false
 }
