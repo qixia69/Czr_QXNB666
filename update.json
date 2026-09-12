@@ -1,12 +1,12 @@
 {
-  "version": "3.1",
-  "versionCode": 5,
+  "version": "3.0",
+  "versionCode": 4,
   "downloadUrl": "https://github.com/qixia69/Czr_QXNB666/releases/download/NexTool/NexTool_3.0.apk",
   "backupUrl": "https://share.feijipan.com/s/8I9Wq8Fm",
   "changelog": [
     "正式发布",
-    "修改检测更新逻辑",
-    "参数明天更新"
+    "修复检测更新",
+    "3.0以下版本将不再维护"
   ],
   "forceUpdate": false
 }
