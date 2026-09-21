@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>NexTool · 卡密管理系统</title>
+<style>
+:root{
+  --bg:#f4f6fb; --card:#ffffff; --card-2:#fafbff; --border:#e4e8f0; --line:#eef1f7;
+  --text:#111827; --sub:#6b7280; --muted:#9ca3af;
+  --accent:#4f7cff; --accent-2:#7c5cff; --accent-soft:#eaf0ff;
+  --ok:#10b981; --ok-soft:#e6f7f1;
+  --warn:#f59e0b; --warn-soft:#fff6e5;
+  --danger:#ef4444; --danger-soft:#fdecec;
+  --purple:#8b5cf6; --purple-soft:#f3ecff;
+  --cyan:#06b6d4; --cyan-soft:#e6f8fb;
+  --shadow-sm:0 1px 2px rgba(15,23,42,.04);
+  --shadow:0 8px 24px rgba(15,23,42,.06);
+  --shadow-lg:0 20px 50px rgba(15,23,42,.12);
+  --radius:16px; --radius-sm:10px; --radius-lg:22px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+html,body{width:100%;height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Helvetica Neue",system-ui,sans-serif;
+  background:var(--bg); color:var(--text); font-size:14px; line-height:1.5;
+  overflow-x:hidden; -webkit-font-smoothing:antialiased;
+}
+input,button,textarea{font-family:inherit;color:inherit;border:none;outline:none;background:none}
+button{cursor:pointer}
+svg{display:block;flex-shrink:0}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.08);opacity:1}100%{transform:scale(1);opacity:1}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(79,124,255,.4)}100%{box-shadow:0 0 0 20px rgba(79,124,255,0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:none}}
+@keyframes toastIn{from{opacity:0;transform:translateY(-20px) scale(.9)}to{opacity:1;transform:none}}
+@keyframes rowIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
+@keyframes gradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+
+.hidden{display:none!important}
+
+/* ===== 认证层 ===== */
+.auth-layer{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  padding:24px;background:
+    radial-gradient(circle at 20% 0%,#e6eeff 0%,transparent 55%),
+    radial-gradient(circle at 80% 100%,#f0e9ff 0%,transparent 55%),
+    var(--bg);
+  transition:opacity .4s ease;overflow-y:auto;
+}
+.auth-layer.leaving{opacity:0;pointer-events:none}
+
+.auth-card{
+  width:100%;max-width:420px;background:var(--card);
+  border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);
+  padding:36px 26px 30px;position:relative;overflow:hidden;
+  animation:fadeInUp .6s cubic-bezier(.2,.9,.3,1.1);
+}
+.auth-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,#4f7cff,#7c5cff,#06b6d4,#4f7cff);
+  background-size:300% 100%;animation:gradientShift 6s linear infinite;
+}
+.auth-logo{
+  width:66px;height:66px;border-radius:20px;margin:0 auto 18px;
+  background:linear-gradient(135deg,#4f7cff,#7c5cff);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 10px 24px rgba(79,124,255,.35);
+  animation:pop .6s cubic-bezier(.2,.9,.3,1.4);
+}
+.auth-logo svg{width:32px;height:32px;color:#fff}
+.auth-title{font-size:22px;font-weight:700;text-align:center;letter-spacing:.5px;color:var(--text)}
+.auth-sub{font-size:12.5px;color:var(--sub);text-align:center;margin-top:6px;margin-bottom:26px}
+
+.field{margin-bottom:14px;position:relative}
+.field-label{font-size:12px;color:var(--sub);margin-bottom:7px;display:flex;align-items:center;gap:6px;font-weight:500}
+.field-label svg{width:13px;height:13px;color:var(--accent)}
+.field-input-wrap{position:relative;display:flex;align-items:center}
+.field-input{
+  width:100%;height:48px;border-radius:12px;background:var(--card-2);
+  border:1.5px solid var(--border);padding:0 44px 0 44px;
+  font-size:14px;color:var(--text);transition:all .25s ease;
+}
+.field-input::placeholder{color:var(--muted)}
+.field-input:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 4px rgba(79,124,255,.12)}
+.field-icon{position:absolute;left:14px;width:18px;height:18px;color:var(--muted);pointer-events:none;transition:color .25s}
+.field-input:focus~.field-icon{color:var(--accent)}
+.field-eye{position:absolute;right:10px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:var(--muted);transition:all .2s}
+.field-eye:active{background:var(--accent-soft)}
+.field-eye svg{width:16px;height:16px}
+
+.auth-btn{
+  width:100%;height:50px;border-radius:12px;margin-top:20px;
+  background:linear-gradient(135deg,#4f7cff,#7c5cff);color:#fff;
+  font-size:15px;font-weight:600;letter-spacing:.3px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 8px 20px rgba(79,124,255,.35);transition:transform .15s,box-shadow .15s;
+  position:relative;overflow:hidden;
+}
+.auth-btn:active{transform:scale(.97);box-shadow:0 4px 12px rgba(79,124,255,.3)}
+.auth-btn svg{width:18px;height:18px}
+.auth-btn.loading{pointer-events:none;opacity:.8}
+
+.auth-msg{margin-top:14px;padding:11px 14px;border-radius:10px;font-size:12.5px;font-weight:500;display:none;align-items:center;gap:8px;animation:fadeIn .25s ease}
+.auth-msg svg{width:16px;height:16px;flex-shrink:0}
+.auth-msg.error{display:flex;background:var(--danger-soft);color:var(--danger)}
+.auth-msg.ok{display:flex;background:var(--ok-soft);color:var(--ok)}
+.auth-layer.shake .auth-card{animation:shake .5s ease}
+.auth-footer{text-align:center;font-size:11px;color:var(--muted);margin-top:22px;letter-spacing:.5px}
+
+/* ===== 主界面 ===== */
+.main-layer{min-height:100vh;display:flex;flex-direction:column;background:var(--bg);animation:fadeIn .4s ease}
+.topbar{
+  position:sticky;top:0;z-index:50;background:rgba(255,255,255,.85);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;gap:12px;
+}
+.topbar-logo{
+  width:38px;height:38px;border-radius:12px;
+  background:linear-gradient(135deg,#4f7cff,#7c5cff);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 12px rgba(79,124,255,.3);flex-shrink:0;
+}
+.topbar-logo svg{width:20px;height:20px;color:#fff}
+.topbar-info{flex:1;min-width:0}
+.topbar-title{font-size:15px;font-weight:700;color:var(--text);letter-spacing:.2px}
+.topbar-user{font-size:11.5px;color:var(--sub);margin-top:2px;display:flex;align-items:center;gap:5px}
+.topbar-user svg{width:11px;height:11px}
+.role-badge{display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.3px}
+.role-author{background:linear-gradient(135deg,#fde68a,#fbbf24);color:#7c4a03}
+.role-admin{background:linear-gradient(135deg,#c7d2fe,#818cf8);color:#1e1b4b}
+
+.topbar-btn{
+  width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  background:var(--card-2);border:1px solid var(--border);color:var(--sub);transition:all .2s;flex-shrink:0;
+}
+.topbar-btn:active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.topbar-btn.active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.topbar-btn svg{width:18px;height:18px}
+
+.topbar-menu{
+  position:absolute;right:12px;top:56px;min-width:180px;
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  box-shadow:0 16px 40px rgba(15,23,42,.15);padding:6px;
+  opacity:0;transform:translateY(-8px) scale(.96);pointer-events:none;
+  transition:all .22s cubic-bezier(.2,.9,.3,1.1);z-index:200;
+  transform-origin:top right;
+}
+.topbar-menu.show{opacity:1;transform:none;pointer-events:auto}
+.menu-item{
+  width:100%;display:flex;align-items:center;gap:10px;padding:11px 12px;
+  border-radius:10px;font-size:13.5px;font-weight:500;color:var(--text);
+  transition:background .15s;text-align:left;
+}
+.menu-item svg{width:16px;height:16px;color:var(--sub);flex-shrink:0}
+.menu-item:active{background:var(--accent-soft)}
+.menu-item:active svg{color:var(--accent)}
+.menu-item.danger{color:var(--danger)}
+.menu-item.danger svg{color:var(--danger)}
+.menu-item.danger:active{background:var(--danger-soft)}
+.menu-divider{height:1px;background:var(--line);margin:4px 6px}
+
+/* ===== Tab 栏（图标上文字下，可横向滑动） ===== */
+.tabs{
+  display:flex;gap:8px;padding:14px 16px 0;background:transparent;
+  position:sticky;top:63px;z-index:40;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.tabs::-webkit-scrollbar{display:none;width:0;height:0}
+.tab{
+  flex:0 0 auto;min-width:92px;padding:10px 14px;border-radius:12px;background:var(--card);
+  border:1px solid var(--border);text-align:center;font-size:12px;
+  color:var(--sub);font-weight:600;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  transition:all .25s ease;box-shadow:var(--shadow-sm);white-space:nowrap;
+}
+.tab svg{width:15px;height:15px;flex-shrink:0}
+.tab.active{
+  background:linear-gradient(135deg,#4f7cff,#7c5cff);color:#fff;border-color:transparent;
+  box-shadow:0 8px 20px rgba(79,124,255,.3);
+}
+.tab .tab-row{display:flex;align-items:center;gap:5px}
+.tab .badge{font-size:10px;padding:1px 6px;border-radius:6px;font-weight:700;background:rgba(79,124,255,.1);color:var(--accent)}
+.tab.active .badge{background:rgba(255,255,255,.25);color:#fff}
+
+.content{padding:14px 16px 100px;flex:1}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:var(--shadow-sm);animation:fadeInUp .4s ease backwards}
+.stat:nth-child(1){animation-delay:.02s}
+.stat:nth-child(2){animation-delay:.06s}
+.stat:nth-child(3){animation-delay:.1s}
+.stat:nth-child(4){animation-delay:.14s}
+.stat-label{font-size:11.5px;color:var(--sub);display:flex;align-items:center;gap:5px}
+.stat-label svg{width:12px;height:12px}
+.stat-value{font-size:22px;font-weight:800;color:var(--text);margin-top:6px;letter-spacing:.5px}
+.stat.c1 .stat-value{color:var(--accent)}
+.stat.c2 .stat-value{color:var(--ok)}
+.stat.c3 .stat-value{color:var(--warn)}
+.stat.c4 .stat-value{color:var(--danger)}
+
+.data-source-bar{
+  display:flex;align-items:center;gap:8px;padding:10px 14px;margin-bottom:12px;
+  background:linear-gradient(135deg,#eef3ff,#f5f0ff);border:1px solid #dbe4ff;
+  border-radius:12px;font-size:11.5px;color:var(--sub);animation:fadeInUp .4s ease;
+}
+.data-source-bar svg{width:14px;height:14px;color:var(--accent);flex-shrink:0}
+.data-source-bar b{color:var(--accent)}
+
+.toolbar{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:12px;box-shadow:var(--shadow-sm)}
+.search-wrap{position:relative;margin-bottom:10px}
+.search-wrap svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);pointer-events:none}
+.search-input{width:100%;height:44px;border-radius:11px;background:var(--card-2);border:1.5px solid var(--border);padding:0 14px 0 40px;font-size:13.5px;color:var(--text);transition:all .2s}
+.search-input:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(79,124,255,.1)}
+
+.filter-row{display:flex;gap:8px;flex-wrap:wrap}
+.filter-chip{padding:7px 13px;border-radius:20px;font-size:12px;font-weight:600;background:var(--card-2);color:var(--sub);border:1.5px solid var(--border);transition:all .2s;display:flex;align-items:center;gap:5px}
+.filter-chip svg{width:12px;height:12px}
+.filter-chip:active{transform:scale(.95)}
+.filter-chip.active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+
+.action-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.act-btn{height:44px;border-radius:11px;font-size:12.5px;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transition:all .2s;border:1.5px solid transparent}
+.act-btn svg{width:16px;height:16px}
+.act-btn:active{transform:scale(.95)}
+.act-btn.primary{background:linear-gradient(135deg,#4f7cff,#7c5cff);color:#fff;box-shadow:0 6px 14px rgba(79,124,255,.3)}
+.act-btn.ok{background:var(--ok-soft);color:var(--ok);border-color:#c8ede0}
+.act-btn.danger{background:var(--danger-soft);color:var(--danger);border-color:#fccaca}
+.act-btn.warn{background:var(--warn-soft);color:var(--warn);border-color:#fde4b3}
+.act-btn.ghost{background:var(--card-2);color:var(--text);border-color:var(--border)}
+
+.card-list{display:flex;flex-direction:column;gap:10px}
+.card-item{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px;box-shadow:var(--shadow-sm);transition:all .25s ease;animation:rowIn .35s ease backwards;position:relative;overflow:hidden}
+.card-item:active{transform:scale(.99)}
+.card-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--accent),var(--accent-2))}
+.card-item.s-used::before{background:linear-gradient(180deg,#94a3b8,#64748b)}
+.card-item.s-expired::before{background:linear-gradient(180deg,#f59e0b,#d97706)}
+.card-item.s-banned::before{background:linear-gradient(180deg,#ef4444,#b91c1c)}
+.card-item.s-unused::before{background:linear-gradient(180deg,#10b981,#059669)}
+
+.card-head{display:flex;align-items:center;gap:10px;padding-left:8px}
+.card-key{flex:1;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;font-weight:600;color:var(--text);word-break:break-all;line-height:1.4;-webkit-user-select:text;user-select:text}
+.card-copy{width:32px;height:32px;border-radius:9px;background:var(--card-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--sub);transition:all .2s;flex-shrink:0}
+.card-copy:active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.card-copy svg{width:14px;height:14px}
+
+.card-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;padding-left:8px}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:7px;font-size:11px;font-weight:600}
+.tag svg{width:11px;height:11px}
+.tag-type{background:var(--accent-soft);color:var(--accent)}
+.tag-unused{background:var(--ok-soft);color:var(--ok)}
+.tag-used{background:#eef1f7;color:var(--sub)}
+.tag-expired{background:var(--warn-soft);color:var(--warn)}
+.tag-banned{background:var(--danger-soft);color:var(--danger)}
+.tag-device{background:var(--purple-soft);color:var(--purple);font-family:ui-monospace,monospace;font-size:10.5px}
+.tag-user{background:var(--purple-soft);color:var(--purple);font-family:ui-monospace,monospace}
+
+.card-actions{display:flex;gap:6px;margin-top:10px;padding-left:8px}
+.mini-btn{flex:1;height:34px;border-radius:9px;font-size:11.5px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:4px;background:var(--card-2);border:1px solid var(--border);color:var(--text);transition:all .2s}
+.mini-btn svg{width:13px;height:13px}
+.mini-btn:active{transform:scale(.95)}
+.mini-btn.danger{color:var(--danger);border-color:#fccaca;background:var(--danger-soft)}
+.mini-btn.warn{color:var(--warn);border-color:#fde4b3;background:var(--warn-soft)}
+.mini-btn.ok{color:var(--ok);border-color:#c8ede0;background:var(--ok-soft)}
+
+.empty{padding:60px 20px;text-align:center;animation:fadeIn .4s ease}
+.empty-icon{width:80px;height:80px;margin:0 auto 16px;border-radius:24px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center}
+.empty-icon svg{width:36px;height:36px;color:var(--accent)}
+.empty-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px}
+.empty-sub{font-size:12.5px;color:var(--sub)}
+
+.fab{position:fixed;right:18px;bottom:24px;width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#4f7cff,#7c5cff);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 28px rgba(79,124,255,.4);z-index:60;transition:transform .2s;animation:fadeIn .4s ease .3s backwards}
+.fab:active{transform:scale(.92)}
+.fab svg{width:26px;height:26px}
+
+.modal-mask{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:200;display:flex;align-items:flex-end;justify-content:center;padding:0;animation:fadeIn .25s ease;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.modal{width:100%;max-width:520px;background:var(--card);border-radius:22px 22px 0 0;max-height:88vh;display:flex;flex-direction:column;animation:slideDown .35s cubic-bezier(.2,.9,.3,1.05);overflow:hidden}
+@media(min-width:560px){.modal-mask{align-items:center}.modal{border-radius:22px;max-height:82vh}}
+.modal-header{padding:18px 20px 14px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line)}
+.modal-title{flex:1;font-size:16px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.modal-title svg{width:18px;height:18px;color:var(--accent)}
+.modal-close{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--card-2);color:var(--sub);transition:all .2s}
+.modal-close:active{background:var(--danger-soft);color:var(--danger)}
+.modal-close svg{width:16px;height:16px}
+.modal-body{padding:16px 20px 20px;overflow-y:auto;flex:1}
+.modal-footer{padding:14px 20px 20px;display:flex;gap:10px;border-top:1px solid var(--line)}
+
+.form-row{margin-bottom:14px}
+.form-label{font-size:12.5px;color:var(--text);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.form-label svg{width:13px;height:13px;color:var(--accent)}
+.form-input{width:100%;height:46px;border-radius:11px;background:var(--card-2);border:1.5px solid var(--border);padding:0 14px;font-size:14px;color:var(--text);transition:all .2s}
+.form-input:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(79,124,255,.1)}
+.form-hint{font-size:11.5px;color:var(--sub);margin-top:6px;line-height:1.5}
+
+.type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.type-chip{padding:10px 6px;border-radius:11px;text-align:center;font-size:12px;font-weight:600;background:var(--card-2);color:var(--text);border:1.5px solid var(--border);transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:3px}
+.type-chip svg{width:14px;height:14px;color:var(--accent)}
+.type-chip:active{transform:scale(.95)}
+.type-chip.active{background:linear-gradient(135deg,#4f7cff,#7c5cff);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(79,124,255,.3)}
+.type-chip.active svg{color:#fff}
+
+.btn{flex:1;height:46px;border-radius:12px;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s}
+.btn svg{width:16px;height:16px}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:linear-gradient(135deg,#4f7cff,#7c5cff);color:#fff;box-shadow:0 6px 14px rgba(79,124,255,.3)}
+.btn.ghost{background:var(--card-2);color:var(--text);border:1.5px solid var(--border)}
+.btn.danger{background:var(--danger-soft);color:var(--danger);border:1.5px solid #fccaca}
+
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(17,24,39,.95);color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:500;z-index:9999;display:flex;align-items:center;gap:8px;box-shadow:0 12px 30px rgba(0,0,0,.25);animation:toastIn .3s cubic-bezier(.2,.9,.3,1.1);max-width:88%;pointer-events:none}
+.toast svg{width:16px;height:16px;flex-shrink:0}
+.toast.ok svg{color:#34d399}
+.toast.err svg{color:#f87171}
+.toast.warn svg{color:#fbbf24}
+
+::-webkit-scrollbar{width:0;height:0}
+</style>
+</head>
+<body>
+
+<div id="authLayer" class="auth-layer">
+  <div class="auth-card" id="authCard">
+    <div class="auth-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L4 6v6c0 5 3.4 9.4 8 10 4.6-.6 8-5 8-10V6l-8-4z"/>
+        <path d="M9 12l2 2 4-4"/>
+      </svg>
+    </div>
+    <div class="auth-title">身份验证</div>
+    <div class="auth-sub">仅限作者与管理员访问</div>
+
+    <div class="field">
+      <div class="field-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        身份名称
+      </div>
+      <div class="field-input-wrap">
+        <input class="field-input" id="authUser" type="text" placeholder="请输入身份名称" autocomplete="off">
+        <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        验证密码
+      </div>
+      <div class="field-input-wrap">
+        <input class="field-input" id="authPass" type="password" placeholder="请输入密码" autocomplete="off">
+        <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <button class="field-eye" id="eyeBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        特殊 Key 卡密
+      </div>
+      <div class="field-input-wrap">
+        <input class="field-input" id="authKey" type="text" placeholder="请在此区域输入" autocomplete="off" autocapitalize="characters">
+        <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+      </div>
+    </div>
+
+    <div class="auth-msg" id="authMsg"></div>
+
+    <button class="auth-btn" id="authBtn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+      <span id="authBtnText">进入系统</span>
+    </button>
+
+    <div class="auth-footer">NexTool · 卡密管理系统</div>
+  </div>
+</div>
+
+<div id="mainLayer" class="main-layer hidden">
+  <div class="topbar">
+    <div class="topbar-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v6c0 5 3.4 9.4 8 10 4.6-.6 8-5 8-10V6l-8-4z"/><path d="M9 12l2 2 4-4"/></svg>
+    </div>
+    <div class="topbar-info">
+      <div class="topbar-title">卡密管理系统</div>
+      <div class="topbar-user">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span id="currentUser">-</span>
+        <span class="role-badge role-admin" id="currentRole">管理员</span>
+      </div>
+    </div>
+    <button class="topbar-btn" id="btnMore" type="button" title="更多">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+    </button>
+    <div class="topbar-menu" id="topbarMenu">
+      <button class="menu-item" id="btnExport" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        导出数据
+      </button>
+      <button class="menu-item" id="btnImport" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        导入数据
+      </button>
+      <div class="menu-divider"></div>
+      <button class="menu-item danger" id="logoutBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        退出登录
+      </button>
+    </div>
+    <input type="file" id="importFile" accept=".json,application/json" style="display:none">
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="panel" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v6c0 5 3.4 9.4 8 10 4.6-.6 8-5 8-10V6l-8-4z"/></svg>
+      <span class="tab-row">插件卡密 <span class="badge" id="panelBadge">0</span></span>
+    </button>
+    <button class="tab" data-tab="main" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+      <span class="tab-row">参数卡密 <span class="badge" id="mainBadge">0</span></span>
+    </button>
+    <button class="tab" data-tab="public" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span class="tab-row">公益账号 <span class="badge" id="publicBadge">0</span></span>
+    </button>
+  </div>
+
+  <div class="content" id="content"></div>
+
+  <button class="fab" id="fabAdd" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+</div>
+
+<script>
+const IDENTITIES = [
+  { user:'雨帝_YD', pass:'yd_nb666_CYWQX', key:'YD66-6YDN-B666-CYWQ-X001', role:'author',  roleText:'作者' },
+  { user:'终夜_ZY', pass:'ZY_nb666_CYWQX', key:'ZY66-6ZYN-B666-CYWQ-X002', role:'admin',   roleText:'管理员' },
+  { user:'阿意_AY', pass:'ay_nb666_CYWQX', key:'AY66-6AYN-B666-CYWQ-X003', role:'admin',   roleText:'管理员' },
+  { user:'白夜_BY', pass:'by_nb666_CYWQX', key:'BY66-6BYN-B666-CYWQ-X004', role:'admin',   roleText:'管理员' },
+  { user:'不悔_BH', pass:'bh_nb666_CYWQX', key:'BH66-6BHN-B666-CYWQ-X005', role:'admin',   roleText:'管理员' },
+  { user:'雨时_YS', pass:'ys_nb666_CYWQX', key:'YS66-6YSN-B666-CYWQ-X006', role:'admin',   roleText:'管理员' },
+];
+
+const CARD_TYPES = {
+  author:  { name:'作者卡', duration: -1,            color:'purple' },
+  admin:   { name:'管理员', duration: 365*24*3600e3, color:'purple' },
+  developer:{ name:'开发者', duration: 180*24*3600e3, color:'cyan' },
+  debug:   { name:'调试',   duration: 24*3600e3,      color:'cyan' },
+  forever: { name:'永久',   duration: -1,            color:'warn' },
+  month:   { name:'月卡',   duration: 30*24*3600e3,  color:'accent' },
+  season:  { name:'季卡',   duration: 90*24*3600e3,  color:'accent' },
+  week:    { name:'周卡',   duration: 7*24*3600e3,   color:'accent' },
+  day:     { name:'天卡',   duration: 24*3600e3,     color:'accent' },
+  hour:    { name:'时卡',   duration: 3600e3,        color:'accent' },
+  custom:  { name:'自定义', duration: 0,             color:'accent' },
+};
+
+const STORAGE_KEY = 'nextool_cards_v2';
+
+function getDefaultDB(){
+  return {
+    panel: [],
+    main: [],
+    public: [
+      { id:'pub_default_1', username:'123', password:'123', createdAt: Date.now(),
+        activatedAt: Date.now(), expireAt: 0, banned:false, remark:'内置公益账号', boundDevice:'' }
+    ]
+  };
+}
+
+function normalizeDB(d){
+  if(!d || typeof d !== 'object') d = {};
+  if(!Array.isArray(d.panel)) d.panel = [];
+  if(!Array.isArray(d.main)) d.main = [];
+  if(!Array.isArray(d.public)) d.public = [];
+  return d;
+}
+
+let DB = getDefaultDB();
+let dataSource = 'default';
+
+async function initData(){
+  try{
+    const s = localStorage.getItem(STORAGE_KEY);
+    if(s){
+      const d = JSON.parse(s);
+      DB = normalizeDB(d);
+      dataSource = 'local';
+      return;
+    }
+  }catch(e){}
+  try{
+    const res = await fetch('./data.json?_t=' + Date.now(), {cache:'no-store'});
+    if(res.ok){
+      const d = await res.json();
+      DB = normalizeDB(d);
+      dataSource = 'remote';
+      saveData(DB);
+      return;
+    }
+  }catch(e){}
+  DB = normalizeDB(getDefaultDB());
+  dataSource = 'default';
+}
+
+function saveData(d){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }catch(e){}
+}
+
+function exportData(){
+  try{
+    const json = JSON.stringify(DB, null, 2);
+    const blob = new Blob([json], {type:'application/json;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'data.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 3000);
+    toast('已导出 data.json，请上传到 GitHub 仓库覆盖原文件', 'ok');
+  }catch(e){
+    toast('导出失败：' + (e.message||'未知错误'), 'err');
+  }
+}
+
+function importDataFromFile(file){
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    try{
+      const d = JSON.parse(ev.target.result);
+      DB = normalizeDB(d);
+      saveData(DB);
+      dataSource = 'local';
+      toast('导入成功，已更新本地数据', 'ok');
+      renderContent();
+    }catch(err){
+      toast('文件格式错误，无法解析', 'err');
+    }
+  };
+  reader.onerror = ()=>{ toast('读取文件失败', 'err'); };
+  reader.readAsText(file);
+}
+
+function getDeviceFingerprint(){
+  let fp = localStorage.getItem('nextool_device_fp');
+  if(!fp){
+    const raw = (navigator.userAgent||'') + '|' + screen.width + 'x' + screen.height + '|' + (Intl.DateTimeFormat().resolvedOptions().timeZone||'');
+    let h = 0;
+    for(let i=0;i<raw.length;i++){ h = ((h<<5)-h) + raw.charCodeAt(i); h |= 0; }
+    fp = 'DEV-' + Math.abs(h).toString(36).toUpperCase().padStart(8,'0');
+    localStorage.setItem('nextool_device_fp', fp);
+  }
+  return fp;
+}
+
+function $(id){ return document.getElementById(id); }
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function escapeHtml(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function fmtTime(ms){
+  if(!ms || ms<=0) return '--';
+  const d = new Date(ms);
+  const p = n => String(n).padStart(2,'0');
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());
+}
+function genCardKey(){
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const group = () => Array.from({length:4},()=>chars[Math.floor(Math.random()*chars.length)]).join('');
+  return [group(),group(),group(),group(),group()].join('-');
+}
+function toast(msg, type){
+  const t = document.createElement('div');
+  t.className = 'toast ' + (type||'');
+  const icons = {
+    ok:'<polyline points="20 6 9 17 4 12"/>',
+    err:'<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>',
+    warn:'<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>'
+  };
+  t.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'+(icons[type]||icons.ok)+'</svg><span>'+escapeHtml(msg)+'</span>';
+  document.body.appendChild(t);
+  setTimeout(()=>{ t.style.transition='opacity .3s, transform .3s'; t.style.opacity='0'; t.style.transform='translate(-50%,-20px)'; }, 2200);
+  setTimeout(()=>t.remove(), 2600);
+}
+
+let currentUser = null;
+
+function doAuth(){
+  const u = $('authUser').value.trim();
+  const p = $('authPass').value;
+  const k = $('authKey').value.trim().toUpperCase();
+  const layer = $('authLayer');
+  const msg = $('authMsg');
+  const btn = $('authBtn');
+  const btnText = $('authBtnText');
+
+  msg.className = 'auth-msg';
+  msg.innerHTML = '';
+
+  if(!u || !p || !k){
+    layer.classList.add('shake');
+    setTimeout(()=>layer.classList.remove('shake'), 500);
+    msg.className = 'auth-msg error';
+    msg.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>请填写完整的三个字段</span>';
+    return;
+  }
+
+  btn.classList.add('loading');
+  btnText.textContent = '验证中...';
+
+  setTimeout(()=>{
+    const found = IDENTITIES.find(i =>
+      i.user === u && i.pass === p && i.key.toUpperCase() === k
+    );
+
+    if(!found){
+      layer.classList.add('shake');
+      setTimeout(()=>layer.classList.remove('shake'), 500);
+      msg.className = 'auth-msg error';
+      msg.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><span>身份验证失败，请检查输入</span>';
+      btn.classList.remove('loading');
+      btnText.textContent = '进入系统';
+      return;
+    }
+
+    currentUser = found;
+    msg.className = 'auth-msg ok';
+    msg.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>验证成功，正在加载数据...</span>';
+    btnText.textContent = '欢迎，' + found.user;
+
+    (async ()=>{
+      await initData();
+      setTimeout(()=>{
+        layer.classList.add('leaving');
+        setTimeout(()=>{
+          layer.classList.add('hidden');
+          enterMain();
+        }, 400);
+      }, 300);
+    })();
+  }, 600);
+}
+
+$('authBtn').addEventListener('click', doAuth);
+$('authKey').addEventListener('keydown', e => { if(e.key === 'Enter') doAuth(); });
+$('authPass').addEventListener('keydown', e => { if(e.key === 'Enter') doAuth(); });
+$('authUser').addEventListener('keydown', e => { if(e.key === 'Enter') $('authPass').focus(); });
+
+$('eyeBtn').addEventListener('click', ()=>{
+  const inp = $('authPass');
+  const isPwd = inp.type === 'password';
+  inp.type = isPwd ? 'text' : 'password';
+  $('eyeBtn').innerHTML = isPwd
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+});
+
+let activeTab = 'panel';
+let filter = 'all';
+let keyword = '';
+
+function enterMain(){
+  $('mainLayer').classList.remove('hidden');
+  $('currentUser').textContent = currentUser.user;
+  const rb = $('currentRole');
+  rb.textContent = currentUser.roleText;
+  rb.className = 'role-badge ' + (currentUser.role === 'author' ? 'role-author' : 'role-admin');
+  renderContent();
+}
+
+function logout(){
+  currentUser = null;
+  $('authUser').value = '';
+  $('authPass').value = '';
+  $('authKey').value = '';
+  $('authMsg').className = 'auth-msg';
+  $('authBtnText').textContent = '进入系统';
+  $('mainLayer').classList.add('hidden');
+  const layer = $('authLayer');
+  layer.classList.remove('hidden','leaving');
+  layer.style.opacity = '';
+}
+
+const topbarMenu = $('topbarMenu');
+const btnMore = $('btnMore');
+
+function openMenu(){ topbarMenu.classList.add('show'); btnMore.classList.add('active'); }
+function closeMenu(){ topbarMenu.classList.remove('show'); btnMore.classList.remove('active'); }
+
+btnMore.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  if(topbarMenu.classList.contains('show')) closeMenu();
+  else openMenu();
+});
+document.addEventListener('click', (e)=>{
+  if(!topbarMenu.contains(e.target) && e.target !== btnMore && !btnMore.contains(e.target)){
+    closeMenu();
+  }
+});
+
+$('logoutBtn').addEventListener('click', ()=>{ closeMenu(); logout(); });
+$('btnExport').addEventListener('click', ()=>{ closeMenu(); exportData(); });
+$('btnImport').addEventListener('click', ()=>{ closeMenu(); $('importFile').click(); });
+$('importFile').addEventListener('change', (e)=>{
+  const f = e.target.files && e.target.files[0];
+  if(f) importDataFromFile(f);
+  e.target.value = '';
+});
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    activeTab = tab.dataset.tab;
+    filter = 'all';
+    keyword = '';
+    renderContent();
+  });
+});
+
+function getStatus(c){
+  if(c.banned) return 'banned';
+  if(!c.activatedAt) return 'unused';
+  if(c.expireAt > 0 && c.expireAt < Date.now()) return 'expired';
+  return 'used';
+}
+function getStatusText(s){
+  return { unused:'未使用', used:'已使用', expired:'已过期', banned:'已拉黑' }[s];
+}
+function getStatusClass(s){ return 's-' + s; }
+
+function renderContent(){
+  if(activeTab === 'public') return renderPublicContent();
+  return renderCardContent();
+}
+
+function dataSourceBar(){
+  const texts = {
+    local:'当前数据来自：<b>本机浏览器</b>（你自己生成的数据）',
+    remote:'当前数据来自：<b>仓库的 data.json</b>（只读快照）',
+    default:'当前数据来自：<b>系统默认</b>（没有任何数据）'
+  };
+  return '<div class="data-source-bar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/><polyline points="21 3 21 9 15 9"/></svg><span>'+texts[dataSource]+'</span></div>';
+}
+
+function renderPublicContent(){
+  const list = DB.public || [];
+  const filtered = list.filter(c=>{
+    if(filter !== 'all' && getStatus(c) !== filter) return false;
+    if(keyword && !(c.username||'').toUpperCase().includes(keyword.toUpperCase())) return false;
+    return true;
+  });
+
+  const total = list.length;
+  const unused = list.filter(c=>getStatus(c)==='unused').length;
+  const used = list.filter(c=>getStatus(c)==='used').length;
+  const expired = list.filter(c=>getStatus(c)==='expired').length;
+
+  $('panelBadge').textContent = DB.panel.length;
+  $('mainBadge').textContent = DB.main.length;
+  $('publicBadge').textContent = DB.public.length;
+
+  let html = dataSourceBar();
+  html += `
+    <div class="stats">
+      <div class="stat c1"><div class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>总账号</div><div class="stat-value">${total}</div></div>
+      <div class="stat c2"><div class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>未使用</div><div class="stat-value">${unused}</div></div>
+      <div class="stat c3"><div class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>已使用</div><div class="stat-value">${used}</div></div>
+      <div class="stat c4"><div class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>已过期</div><div class="stat-value">${expired}</div></div>
+    </div>
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="search-input" id="searchInput" type="text" placeholder="搜索账号..." value="${escapeHtml(keyword)}">
+      </div>
+      <div class="filter-row">
+        ${['all','unused','used','expired','banned'].map(f=>{
+          const names = {all:'全部',unused:'未使用',used:'已使用',expired:'已过期',banned:'已禁用'};
+          return '<button class="filter-chip'+(filter===f?' active':'')+'" data-filter="'+f+'">'+names[f]+'</button>';
+        }).join('')}
+      </div>
+      <div class="action-row">
+        <button class="act-btn primary" id="btnPubAdd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>新增账号</button>
+        <button class="act-btn warn" id="btnPubTime"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>批量加时</button>
+        <button class="act-btn danger" id="btnPubDel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>批量删除</button>
+      </div>
+    </div>
+  `;
+
+  if(filtered.length === 0){
+    html += `<div class="empty">
+      <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+      <div class="empty-title">${keyword || filter !== 'all' ? '没有匹配的账号' : '暂无公益账号'}</div>
+      <div class="empty-sub">${keyword || filter !== 'all' ? '试试更换筛选条件' : '点击上方按钮新增公益账号'}</div>
+    </div>`;
+  } else {
+    html += '<div class="card-list">';
+    filtered.forEach((c,i)=>{
+      const st = getStatus(c);
+      const deviceTag = c.boundDevice
+        ? '<span class="tag tag-device">'+escapeHtml(c.boundDevice)+'</span>' : '';
+      const expiry = c.expireAt > 0
+        ? '<span class="tag tag-used">'+fmtTime(c.expireAt)+'</span>'
+        : '<span class="tag tag-unused">永久有效</span>';
+      html += `
+        <div class="card-item ${getStatusClass(st)}" style="animation-delay:${Math.min(i*30,300)}ms">
+          <div class="card-head">
+            <div class="card-key">${escapeHtml(c.username)}</div>
+            <button class="card-copy" data-copy="${escapeHtml(c.username)}" title="复制账号">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </div>
+          <div class="card-meta">
+            <span class="tag tag-user">密码：${escapeHtml(c.password||'--')}</span>
+            <span class="tag tag-${st}">${st==='banned'?'已禁用':getStatusText(st)}</span>
+            ${expiry}
+            ${deviceTag}
+            ${c.remark ? '<span class="tag tag-used">'+escapeHtml(c.remark)+'</span>' : ''}
+          </div>
+          <div class="card-actions">
+            <button class="mini-btn" data-pact="copyBoth" data-id="${c.id}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              复制
+            </button>
+            <button class="mini-btn" data-pact="addTime" data-id="${c.id}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              加时
+            </button>
+            <button class="mini-btn ${st==='banned'?'ok':'warn'}" data-pact="ban" data-id="${c.id}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${st==='banned'?'<polyline points="20 6 9 17 4 12"/>':'<circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>'}</svg>
+              ${st==='banned'?'启用':'禁用'}
+            </button>
+            <button class="mini-btn danger" data-pact="del" data-id="${c.id}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>
+              删除
+            </button>
+          </div>
+        </div>
+      `;
+    });
+    html += '</div>';
+  }
+
+  $('content').innerHTML = html;
+
+  const si = $('searchInput');
+  if(si){
+    si.addEventListener('input', ()=>{ keyword = si.value; renderContent(); setTimeout(()=>{ const x=$('searchInput'); if(x){ x.focus(); x.setSelectionRange(x.value.length,x.value.length);} }, 0); });
+  }
+  document.querySelectorAll('.filter-chip').forEach(b=>{
+    b.addEventListener('click', ()=>{ filter = b.dataset.filter; renderContent(); });
+  });
+  document.querySelectorAll('.card-copy').forEach(b=>{
+    b.addEventListener('click', ()=>{ copyText(b.dataset.copy, '账号已复制'); });
+  });
+  document.querySelectorAll('.mini-btn').forEach(b=>{
+    b.addEventListener('click', ()=>handlePublicAction(b.dataset.pact, b.dataset.id));
+  });
+  $('btnPubAdd').addEventListener('click', openPublicAddModal);
+  $('btnPubTime').addEventListener('click', openPublicBatchTimeModal);
+  $('btnPubDel').addEventListener('click', openPublicBatchDelModal);
+}
+
+function renderCardContent(){
+  const list = DB[activeTab] || [];
+  const filtered = list.filter(c=>{
+    if(filter !== 'all' && getStatus(c) !== filter) return false;
+    if(keyword && !c.key.toUpperCase().includes(keyword.toUpperCase())) return false;
+    return true;
+  });
+
+  const total = list.length;
+  const unused = list.filter(c=>getStatus(c)==='unused').length;
+  const used = list.filter(c=>getStatus(c)==='used').length;
+  const expired = list.filter(c=>getStatus(c)==='expired').length;
+
+  $('panelBadge').textContent = DB.panel.length;
+  $('mainBadge').textContent = DB.main.length;
+  $('publicBadge').textContent = DB.public.length;
+
+  let html = dataSourceBar();
+  html += `
+    <div class="stats">
+      <div class="stat c1"><div class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>总卡密</div><div class="stat-value">${total}</div></div>
+      <div class="stat c2"><div class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>未使用</div><div class="stat-value">${unused}</div></div>
+      <div class="stat c3"><div class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>已使用</div><div class="stat-value">${used}</div></div>
+      <div class="stat c4"><div class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>已过期</div><div class="stat-value">${expired}</div></div>
+    </div>
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="search-input" id="searchInput" type="text" placeholder="搜索卡密..." value="${escapeHtml(keyword)}">
+      </div>
+      <div class="filter-row">
+        ${['all','unused','used','expired','banned'].map(f=>{
+          const names = {all:'全部',unused:'未使用',used:'已使用',expired:'已过期',banned:'已拉黑'};
+          return '<button class="filter-chip'+(filter===f?' active':'')+'" data-filter="'+f+'">'+names[f]+'</button>';
+        }).join('')}
+      </div>
+      <div class="action-row">
+        <button class="act-btn primary" id="btnBatchGen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>批量生成</button>
+        <button class="act-btn ok" id="btnBatchTime"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>批量加时</button>
+        <button class="act-btn danger" id="btnBatchDel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>批量删除</button>
+      </div>
+    </div>
+  `;
+
+  if(filtered.length === 0){
+    html += `<div class="empty">
+      <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+      <div class="empty-title">${keyword || filter !== 'all' ? '没有匹配的卡密' : '暂无卡密'}</div>
+      <div class="empty-sub">${keyword || filter !== 'all' ? '试试更换筛选条件' : '点击右下角按钮生成卡密'}</div>
+    </div>`;
+  } else {
+    html += '<div class="card-list">';
+    filtered.forEach((c,i)=>{
+      const st = getStatus(c);
+      const t = CARD_TYPES[c.type] || CARD_TYPES.day;
+      const deviceTag = c.boundDevice
+        ? '<span class="tag tag-device">'+escapeHtml(c.boundDevice)+'</span>' : '';
+      html += `
+        <div class="card-item ${getStatusClass(st)}" style="animation-delay:${Math.min(i*30,300)}ms">
+          <div class="card-head">
+            <div class="card-key">${escapeHtml(c.key)}</div>
+            <button class="card-copy" data-copy="${escapeHtml(c.key)}" title="复制">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </div>
+          <div class="card-meta">
+            <span class="tag tag-type">${t.name}</span>
+            <span class="tag tag-${st}">${getStatusText(st)}</span>
+            ${c.expireAt>0?'<span class="tag tag-used">'+fmtTime(c.expireAt)+'</span>':''}
+            ${deviceTag}
+          </div>
+          <div class="card-actions">
+            <button class="mini-btn" data-act="addTime" data-key="${escapeHtml(c.key)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>加时</button>
+            <button class="mini-btn warn" data-act="subTime" data-key="${escapeHtml(c.key)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>减时</button>
+            <button class="mini-btn ${st==='banned'?'ok':'danger'}" data-act="ban" data-key="${escapeHtml(c.key)}">${st==='banned'?'解封':'拉黑'}</button>
+            <button class="mini-btn danger" data-act="del" data-key="${escapeHtml(c.key)}">删除</button>
+          </div>
+        </div>
+      `;
+    });
+    html += '</div>';
+  }
+
+  $('content').innerHTML = html;
+
+  const si = $('searchInput');
+  if(si){
+    si.addEventListener('input', ()=>{ keyword = si.value; renderContent(); setTimeout(()=>{ const x=$('searchInput'); if(x){ x.focus(); x.setSelectionRange(x.value.length,x.value.length);} }, 0); });
+  }
+  document.querySelectorAll('.filter-chip').forEach(b=>{
+    b.addEventListener('click', ()=>{ filter = b.dataset.filter; renderContent(); });
+  });
+  document.querySelectorAll('.card-copy').forEach(b=>{
+    b.addEventListener('click', ()=>copyText(b.dataset.copy, '卡密已复制'));
+  });
+  document.querySelectorAll('.mini-btn').forEach(b=>{
+    b.addEventListener('click', ()=>handleCardAction(b.dataset.act, b.dataset.key));
+  });
+  $('btnBatchGen').addEventListener('click', openBatchGenModal);
+  $('btnBatchTime').addEventListener('click', openBatchTimeModal);
+  $('btnBatchDel').addEventListener('click', openBatchDelModal);
+}
+
+function copyText(txt, okMsg){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(()=>toast(okMsg||'已复制','ok')).catch(()=>fallbackCopy(txt, okMsg));
+  } else fallbackCopy(txt, okMsg);
+}
+function fallbackCopy(txt, okMsg){
+  try{
+    const ta = document.createElement('textarea');
+    ta.value = txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    toast(okMsg||'已复制','ok');
+  }catch(e){ toast('复制失败','err'); }
+}
+
+function findCard(key){ return (DB[activeTab]||[]).find(c=>c.key === key); }
+function findPublic(id){ return (DB.public||[]).find(c=>c.id === id); }
+
+function handlePublicAction(act, id){
+  const c = findPublic(id);
+  if(!c) return;
+  if(act === 'copyBoth'){
+    copyText('账号：'+c.username+'\n密码：'+c.password, '账号密码已复制');
+  } else if(act === 'ban'){
+    c.banned = !c.banned;
+    saveData(DB);
+    toast(c.banned?'已禁用':'已启用', c.banned?'warn':'ok');
+    renderContent();
+  } else if(act === 'del'){
+    if(!confirm('确定删除该公益账号？')) return;
+    DB.public = DB.public.filter(x=>x.id!==id);
+    saveData(DB);
+    toast('已删除','ok');
+    renderContent();
+  } else if(act === 'addTime'){
+    openPublicTimeModal(id, 1);
+  }
+}
+
+function handleCardAction(act, key){
+  const c = findCard(key);
+  if(!c) return;
+  if(act === 'ban'){
+    c.banned = !c.banned;
+    saveData(DB);
+    toast(c.banned?'已拉黑':'已解封', c.banned?'warn':'ok');
+    renderContent();
+  } else if(act === 'del'){
+    if(!confirm('确定删除该卡密？')) return;
+    DB[activeTab] = DB[activeTab].filter(x=>x.key!==key);
+    saveData(DB);
+    toast('已删除','ok');
+    renderContent();
+  } else if(act === 'addTime') openTimeModal(key, 1);
+  else if(act === 'subTime') openTimeModal(key, -1);
+}
+
+function showModal(html){
+  const mask = document.createElement('div');
+  mask.className = 'modal-mask';
+  mask.innerHTML = '<div class="modal">' + html + '</div>';
+  mask.addEventListener('click', e=>{ if(e.target === mask) mask.remove(); });
+  document.body.appendChild(mask);
+  return mask;
+}
+function modalHeader(title, iconPath){
+  return `<div class="modal-header">
+    <div class="modal-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${iconPath}</svg>${title}</div>
+    <button class="modal-close" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>`;
+}
+
+function openPublicAddModal(){
+  const html = modalHeader('新增公益账号','<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>') + `
+    <div class="modal-body">
+      <div class="form-row"><div class="form-label">账号</div><input class="form-input" id="paUser" type="text" placeholder="请输入账号名" autocomplete="off"></div>
+      <div class="form-row"><div class="form-label">密码</div><input class="form-input" id="paPass" type="text" placeholder="请输入密码" autocomplete="off"></div>
+      <div class="form-row"><div class="form-label">有效时长（小时，0 表示永久）</div><input class="form-input" id="paHours" type="number" value="24" min="0" max="87600"></div>
+      <div class="form-row"><div class="form-label">备注（可选）</div><input class="form-input" id="paRemark" type="text" placeholder="例如：内测账号" maxlength="20"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn ghost" data-close>取消</button>
+      <button class="btn primary" id="paConfirm">确认新增</button>
+    </div>
+  `;
+  const mask = showModal(html);
+  mask.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>mask.remove()));
+  mask.querySelector('#paConfirm').addEventListener('click', ()=>{
+    const u = mask.querySelector('#paUser').value.trim();
+    const p = mask.querySelector('#paPass').value.trim();
+    const h = parseInt(mask.querySelector('#paHours').value)||0;
+    const r = mask.querySelector('#paRemark').value.trim();
+    if(!u || !p){ toast('请填写账号和密码','err'); return; }
+    if(DB.public.some(x=>x.username === u)){ toast('该账号已存在','err'); return; }
+    const now = Date.now();
+    DB.public.unshift({
+      id: 'pub_' + uid(),
+      username: u, password: p,
+      createdAt: now, activatedAt: now,
+      expireAt: h > 0 ? now + h*3600e3 : 0,
+      banned: false, remark: r, boundDevice: ''
+    });
+    saveData(DB);
+    mask.remove();
+    toast('已新增公益账号','ok');
+    renderContent();
+  });
+}
+
+function openPublicTimeModal(id, sign){
+  const c = findPublic(id);
+  if(!c) return;
+  const html = modalHeader('加时 · ' + c.username, '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>') + `
+    <div class="modal-body">
+      <div style="background:var(--card-2);border-radius:10px;padding:12px;margin-bottom:14px;font-size:13px">账号：<b>${escapeHtml(c.username)}</b><br>密码：<b>${escapeHtml(c.password)}</b></div>
+      <div class="form-row"><div class="form-label">增加时长（小时）</div><input class="form-input" id="ptHours" type="number" value="24" min="1"></div>
+      <div class="form-hint">${c.expireAt>0 ? '当前到期：'+fmtTime(c.expireAt) : '当前永久有效'}</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn ghost" data-close>取消</button>
+      <button class="btn primary" id="ptConfirm">确认加时</button>
+    </div>
+  `;
+  const mask = showModal(html);
+  mask.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>mask.remove()));
+  mask.querySelector('#ptConfirm').addEventListener('click', ()=>{
+    const h = parseFloat(mask.querySelector('#ptHours').value)||0;
+    if(h<=0){ toast('请输入正数','err'); return; }
+    const base = c.expireAt > Date.now() ? c.expireAt : Date.now();
+    c.expireAt = base + h*3600e3;
+    saveData(DB);
+    mask.remove();
+    toast('已加时','ok');
+    renderContent();
+  });
+}
+
+function openPublicBatchTimeModal(){
+  const html = modalHeader('批量加时 · 公益账号','<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>') + `
+    <div class="modal-body">
+      <div class="form-row"><div class="form-label">选择范围</div>
+        <div class="type-grid" id="pbtScope">
+          <button class="type-chip active" data-scope="all">全部</button>
+          <button class="type-chip" data-scope="unused">未使用</button>
+          <button class="type-chip" data-scope="used">已使用</button>
+          <button class="type-chip" data-scope="expired">已过期</button>
+        </div>
+      </div>
+      <div class="form-row"><div class="form-label">增加时长（小时）</div><input class="form-input" id="pbtHours" type="number" value="24" min="1"></div>
+    </div>
+    <div class="modal-footer"><button class="btn ghost" data-close>取消</button><button class="btn primary" id="pbtConfirm">确认</button></div>
+  `;
+  const mask = showModal(html);
+  let scope = 'all';
+  mask.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>mask.remove()));
+  mask.querySelectorAll('#pbtScope .type-chip').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      mask.querySelectorAll('#pbtScope .type-chip').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active'); scope = b.dataset.scope;
+    });
+  });
+  mask.querySelector('#pbtConfirm').addEventListener('click', ()=>{
+    const h = parseFloat(mask.querySelector('#pbtHours').value)||0;
+    if(h<=0){ toast('请输入正数','err'); return; }
+    const delta = h*3600e3;
+    let n = 0;
+    DB.public.forEach(c=>{
+      const st = getStatus(c);
+      if(scope !== 'all' && st !== scope) return;
+      const base = c.expireAt > Date.now() ? c.expireAt : Date.now();
+      c.expireAt = base + delta;
+      n++;
+    });
+    saveData(DB);
+    mask.remove();
+    toast('已加时 '+n+' 个账号','ok');
+    renderContent();
+  });
+}
+
+function openPublicBatchDelModal(){
+  const html = modalHeader('批量删除 · 公益账号','<polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/>') + `
+    <div class="modal-body">
+      <div class="form-row"><div class="form-label">删除范围</div>
+        <div class="type-grid" id="pbdScope">
+          <button class="type-chip active" data-scope="all">全部</button>
+          <button class="type-chip" data-scope="unused">未使用</button>
+          <button class="type-chip" data-scope="used">已使用</button>
+          <button class="type-chip" data-scope="expired">已过期</button>
+          <button class="type-chip" data-scope="banned">已禁用</button>
+        </div>
+      </div>
+      <div class="form-hint" style="color:#ef4444">删除后不可恢复</div>
+    </div>
+    <div class="modal-footer"><button class="btn ghost" data-close>取消</button><button class="btn danger" id="pbdConfirm">确认删除</button></div>
+  `;
+  const mask = showModal(html);
+  let scope = 'all';
+  mask.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>mask.remove()));
+  mask.querySelectorAll('#pbdScope .type-chip').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      mask.querySelectorAll('#pbdScope .type-chip').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active'); scope = b.dataset.scope;
+    });
+  });
+  mask.querySelector('#pbdConfirm').addEventListener('click', ()=>{
+    const before = DB.public.length;
+    if(scope === 'all') DB.public = [];
+    else DB.public = DB.public.filter(c=>getStatus(c) !== scope);
+    const n = before - DB.public.length;
+    saveData(DB);
+    mask.remove();
+    toast('已删除 '+n+' 个账号','ok');
+    renderContent();
+  });
+}
+
+function openBatchGenModal(){
+  let selectedType = 'day';
+  const html = modalHeader('批量生成卡密','<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>') + `
+    <div class="modal-body">
+      <div class="form-row"><div class="form-label">生成数量</div><input class="form-input" id="genCount" type="number" value="10" min="1" max="500"></div>
+      <div class="form-row"><div class="form-label">卡密类型</div>
+        <div class="type-grid" id="typeGrid">${Object.keys(CARD_TYPES).map(k=>'<button class="type-chip'+(selectedType===k?' active':'')+'" data-type="'+k+'">'+CARD_TYPES[k].name+'</button>').join('')}</div>
+      </div>
+      <div class="form-row" id="customHoursRow" style="display:none"><div class="form-label">自定义时长（小时）</div><input class="form-input" id="genHours" type="number" value="24" min="1"></div>
+    </div>
+    <div class="modal-footer"><button class="btn ghost" data-close>取消</button><button class="btn primary" id="genConfirm">确认生成</button></div>
+  `;
+  const mask = showModal(html);
+  mask.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>mask.remove()));
+  mask.querySelectorAll('.type-chip').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      mask.querySelectorAll('.type-chip').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active'); selectedType = b.dataset.type;
+      mask.querySelector('#customHoursRow').style.display = selectedType === 'custom' ? 'block' : 'none';
+    });
+  });
+  mask.querySelector('#genConfirm').addEventListener('click', ()=>{
+    const count = parseInt(mask.querySelector('#genCount').value)||0;
+    if(count<1 || count>500){ toast('数量需在 1-500 之间','err'); return; }
+    const customHours = parseInt(mask.querySelector('#genHours').value)||24;
+    const t = CARD_TYPES[selectedType];
+    const duration = selectedType==='custom' ? customHours*3600e3 : t.duration;
+    const now = Date.now();
+    for(let i=0;i<count;i++){
+      DB[activeTab].unshift({ key: genCardKey(), type: selectedType, duration: duration, createdAt: now, activatedAt: 0, expireAt: 0, banned: false, boundDevice: '' });
+    }
+    saveData(DB); mask.remove(); toast('成功生成 '+count+' 张卡密','ok'); renderContent();
+  });
+}
+
+function openBatchTimeModal(){
+  const html = modalHeader('批量加时 / 减时','<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>') + `
+    <div class="modal-body">
+      <div class="form-row"><div class="form-label">选择范围</div>
+        <div class="type-grid" id="btScope">
+          <button class="type-chip active" data-scope="all">全部</button>
+          <button class="type-chip" data-scope="unused">未使用</button>
+          <button class="type-chip" data-scope="used">已使用</button>
+          <button class="type-chip" data-scope="expired">已过期</button>
+        </div>
+      </div>
+      <div class="form-row"><div class="form-label">时间（小时，正数加时负数减时）</div><input class="form-input" id="btHours" type="number" value="24"></div>
+    </div>
+    <div class="modal-footer"><button class="btn ghost" data-close>取消</button><button class="btn primary" id="btConfirm">确认</button></div>
+  `;
+  const mask = showModal(html);
+  let scope = 'all';
+  mask.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>mask.remove()));
+  mask.querySelectorAll('#btScope .type-chip').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      mask.querySelectorAll('#btScope .type-chip').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active'); scope = b.dataset.scope;
+    });
+  });
+  mask.querySelector('#btConfirm').addEventListener('click', ()=>{
+    const hours = parseFloat(mask.querySelector('#btHours').value)||0;
+    if(hours === 0){ toast('时间不能为 0','err'); return; }
+    const delta = hours*3600e3;
+    let n = 0;
+    DB[activeTab].forEach(c=>{
+      const st = getStatus(c);
+      if(scope !== 'all' && st !== scope) return;
+      if(c.activatedAt > 0 && c.expireAt > 0){
+        c.expireAt += delta;
+        if(c.expireAt < Date.now()) c.expireAt = Date.now() - 1000;
+      } else {
+        c.duration = (c.duration||0) + delta;
+        if(c.duration < 0) c.duration = 0;
+      }
+      n++;
+    });
+    saveData(DB); mask.remove(); toast('已'+(hours>0?'加':'减')+'时 '+n+' 张卡密','ok'); renderContent();
+  });
+}
+
+function openBatchDelModal(){
+  const html = modalHeader('批量删除','<polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/>') + `
+    <div class="modal-body">
+      <div class="form-row"><div class="form-label">删除范围</div>
+        <div class="type-grid" id="bdScope">
+          <button class="type-chip active" data-scope="all">全部</button>
+          <button class="type-chip" data-scope="unused">未使用</button>
+          <button class="type-chip" data-scope="used">已使用</button>
+          <button class="type-chip" data-scope="expired">已过期</button>
+          <button class="type-chip" data-scope="banned">已拉黑</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn ghost" data-close>取消</button><button class="btn danger" id="bdConfirm">确认删除</button></div>
+  `;
+  const mask = showModal(html);
+  let scope = 'all';
+  mask.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>mask.remove()));
+  mask.querySelectorAll('#bdScope .type-chip').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      mask.querySelectorAll('#bdScope .type-chip').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active'); scope = b.dataset.scope;
+    });
+  });
+  mask.querySelector('#bdConfirm').addEventListener('click', ()=>{
+    const before = DB[activeTab].length;
+    if(scope === 'all') DB[activeTab] = [];
+    else DB[activeTab] = DB[activeTab].filter(c=>getStatus(c) !== scope);
+    const n = before - DB[activeTab].length;
+    saveData(DB); mask.remove(); toast('已删除 '+n+' 张卡密','ok'); renderContent();
+  });
+}
+
+function openTimeModal(key, sign){
+  const c = findCard(key);
+  if(!c) return;
+  const html = modalHeader((sign>0?'加时':'减时')+' · 卡密操作','<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>') + `
+    <div class="modal-body">
+      <div style="background:var(--card-2);border-radius:10px;padding:12px;margin-bottom:14px;font-family:ui-monospace,monospace;font-size:12px;word-break:break-all">${escapeHtml(c.key)}</div>
+      <div class="form-row"><div class="form-label">${sign>0?'增加':'减少'}时长（小时）</div><input class="form-input" id="otHours" type="number" value="24" min="1"></div>
+    </div>
+    <div class="modal-footer"><button class="btn ghost" data-close>取消</button><button class="btn ${sign>0?'primary':'danger'}" id="otConfirm">${sign>0?'确认加时':'确认减时'}</button></div>
+  `;
+  const mask = showModal(html);
+  mask.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>mask.remove()));
+  mask.querySelector('#otConfirm').addEventListener('click', ()=>{
+    const hours = parseFloat(mask.querySelector('#otHours').value)||0;
+    if(hours<=0){ toast('请输入正数','err'); return; }
+    const delta = hours*3600e3*sign;
+    if(c.activatedAt>0 && c.expireAt>0){
+      c.expireAt += delta;
+      if(c.expireAt < Date.now()) c.expireAt = Date.now()-1000;
+    } else {
+      c.duration = (c.duration||0) + delta;
+      if(c.duration < 0) c.duration = 0;
+    }
+    saveData(DB); mask.remove(); toast(sign>0?'已加时':'已减时','ok'); renderContent();
+  });
+}
+
+$('fabAdd').addEventListener('click', ()=>{
+  if(activeTab === 'public') openPublicAddModal();
+  else openBatchGenModal();
+});
+
+window.NexToolCards = { DB, IDENTITIES, getDeviceFingerprint };
+</script>
+</body>
+</html>
