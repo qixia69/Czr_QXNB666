@@ -1,10 +1,10 @@
 {
-  "version": "10.0",
-  "versionCode": 9,
+  "version": "11.0",
+  "versionCode": 10,
   "downloadUrl": "https://github.com/qixia69/Czr_QXNB666/releases/download/NexTool/NexTool_6.0.apk",
   "backupUrl": "https://share.feijipan.com/s/8I9Wq8Fm",
   "changelog": [
-    "新增限时活动登录6天免费送3个1KW的账号加卡密"
+    "优化AI调参算法与逻辑"
   ],
   "forceUpdate": false
 }
