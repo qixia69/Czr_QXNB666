@@ -1,10 +1,15 @@
 {
-  "version": "11.0",
-  "versionCode": 10,
+  "version": "12.0",
+  "versionCode": 11,
   "downloadUrl": "https://github.com/qixia69/Czr_QXNB666/releases/download/NexTool/NexTool_6.0.apk",
   "backupUrl": "https://share.feijipan.com/s/8I9Wq8Fm",
   "changelog": [
-    "优化AI调参算法与逻辑"
+    "v12.0已发布，更新内容如下",
+    "优化AI调参算法，算力，逻辑",
+    "增加AI调参预计思考时间",
+    "新增可填写想要的距离段",
+    "修复AI输出滑屏问题",
+    "已续费123账号，账号名与密码还是123"
   ],
   "forceUpdate": false
 }
