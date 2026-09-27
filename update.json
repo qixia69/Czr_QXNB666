@@ -4,12 +4,12 @@
   "downloadUrl": "https://github.com/qixia69/Czr_QXNB666/releases/download/NexTool/NexTool_6.0.apk",
   "backupUrl": "https://share.feijipan.com/s/8I9Wq8Fm",
   "changelog": [
-    "v13.0已发布，更新内容如下。",
-    "AI调参新加入小熊猫项目。",
-    "已支持手动打断AI输出。",
-    "Czr参数结束语包含参数路径与MT下载链接。",
-    "AI调参页位于副页面内部。",
-    "已续费123账号，账号名与密码还是123。"
+    "v14.0已发布，更新内容如下。",
+    "新增输入模式。",
+    "支持从本地 JSON /TXT 文件读入已有参数。",
+    "修复 runAl_Czr / runAl_Panda 缺少 async 导致脚本不执行。",
+    "对话历史同名自动加(1)(2)后缀（按调参项目独立）。",
+    "123账号到期后我们会续费，账号名与密码还是123。"
   ],
   "forceUpdate": false
 }
