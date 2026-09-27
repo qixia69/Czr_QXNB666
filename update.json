@@ -1,15 +1,17 @@
 {
-  "version": "14.0",
-  "versionCode": 13,
+  "version": "15.0",
+  "versionCode": 14,
   "downloadUrl": "https://github.com/qixia69/Czr_QXNB666/releases/download/NexTool/NexTool_6.0.apk",
   "backupUrl": "https://share.feijipan.com/s/8I9Wq8Fm",
   "changelog": [
-    "v14.0已发布，更新内容如下。",
-    "新增输入模式。",
-    "支持从本地 JSON /TXT 文件读入已有参数。",
-    "修复 runAl_Czr / runAl_Panda 缺少 async 导致脚本不执行。",
-    "对话历史同名自动加(1)(2)后缀（按调参项目独立）。",
-    "123账号到期后我们会续费，账号名与密码还是123。"
+    "v15.0已发布，更新内容如下。",
+    "Al 调参算法升级：Hermite 三次样条/Catmull-Rom 平滑/高 斯钟形加权/ Quintic smoothstep。",
+    "新增段间平滑：消除相邻距离段提前量突变，弹道过渡更自然。",
+    "新增迭代收敛检测：方差改善率实时显示，最多2轮优化。",
+    "新增数值防护：NaN/Inf 全链路保护，不再出现异常参数。",
+    "每个问题下方新增详细解释，讲清原理和推荐值。",
+    "修复 Android 16 WebView 桥接 Method not found 问题。",
+    "已续费123账号，账号名与密码还是123。"
   ],
   "forceUpdate": false
 }
