@@ -1,10 +1,10 @@
 {
-  "version": "15.0",
-  "versionCode": 14,
+  "version": "16.0",
+  "versionCode": 15,
   "downloadUrl": "https://github.com/qixia69/Czr_QXNB666/releases/download/NexTool/NexTool_6.0.apk",
   "backupUrl": "https://share.feijipan.com/s/8I9Wq8Fm",
   "changelog": [
-    "v15.0已发布，更新内容如下。",
+    "v16.0已发布，更新内容如下。",
     "Al 调参算法升级：Hermite 三次样条/Catmull-Rom 平滑/高 斯钟形加权/ Quintic smoothstep。",
     "新增段间平滑：消除相邻距离段提前量突变，弹道过渡更自然。",
     "新增迭代收敛检测：方差改善率实时显示，最多2轮优化。",
