@@ -1,15 +1,15 @@
 {
-  "version": "16.0",
-  "versionCode": 15,
+  "version": "17.0",
+  "versionCode": 16,
   "downloadUrl": "https://github.com/qixia69/Czr_QXNB666/releases/download/NexTool/NexTool_6.0.apk",
   "backupUrl": "https://share.feijipan.com/s/8I9Wq8Fm",
   "changelog": [
-    "v16.0已发布，更新内容如下。",
-    "Al 调参算法升级：Hermite 三次样条/Catmull-Rom 平滑/高 斯钟形加权/ Quintic smoothstep。",
-    "新增段间平滑：消除相邻距离段提前量突变，弹道过渡更自然。",
-    "新增迭代收敛检测：方差改善率实时显示，最多2轮优化。",
-    "新增数值防护：NaN/Inf 全链路保护，不再出现异常参数。",
-    "每个问题下方新增详细解释，讲清原理和推荐值。",
+    "v17.0已发布，更新内容如下。",
+    "Al 调参新增输出倍速可调，x1.0 至x10.0 共 19 档。",
+    "输出倍速作用于思考过程与参数代码的文字逐字输出。",
+    "预计输出时间（ETA）会跟随倍速实时变化。",
+    "倍速设置自动记忆，下次打开沿用上次的选择。",
+    "输出中途可随时调整倍速，无需重新开始分析。",
     "修复 Android 16 WebView 桥接 Method not found 问题。",
     "已续费123账号，账号名与密码还是123。"
   ],
