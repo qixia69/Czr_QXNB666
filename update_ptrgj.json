@@ -1,11 +1,10 @@
 {
-  "version": "2.0",
-  "downloadUrl": "https://share.feijipan.com/s/8Gxejbm7",
+  "version": "1.0",
+  "downloadUrl": "https://github.com/qixia69/Czr_QXNB666/releases/download/Ptr%E8%B5%84%E6%BA%90/Ptr._",
+  "backupUrl": "https://share.feijipan.com/s/8I9Wq8Fm",
   "changelog": [
-    "1. 全新 Ptr工具 发布！",
-    "2. 支持视频转 MP3、图片转格式、MP3转直链、视频转GIF。",
-    "3. 优化了侧边栏排版，修复了历史 BUG。",
-    "4. 本次更新请前往网盘下载最新安装包覆盖安装。"
-  ],
-  "forceUpdate": false
+    "1. 优化了工具页面UI与交互体验。",
+    "2. 增加了卡密加密防破解机制。",
+    "3. 修复了部分已知问题。"
+  ]
 }
