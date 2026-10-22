@@ -1,0 +1,14 @@
+{
+  "version": "2.0",
+  "downloadUrl": "https://你的APK直链.apk",
+  "backupUrl": "https://share.feijipan.com/s/8I9Wq8Fm",
+  "changelog": [
+    "Ptr资源分享 v2.0 正式发布！",
+    "移除了主页六宫格，分类全在侧边栏。",
+    "限制列表高度为 45vh 内部滑动，手风琴动画更丝滑。",
+    "修复图标不显示及撑爆排版问题。",
+    "新增本地点击音效支持（assets放入 click.mp3）。",
+    "修复检查更新逻辑，直接拉取 update_zyfx.json。"
+  ],
+  "forceUpdate": false
+}
