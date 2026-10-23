@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "downloadUrl": "https://github.com/qixia69/Czr_QXNB666/releases/download/Ptr%E8%B5%84%E6%BA%90/Ptr_VPN_1.0.apk",
+  "backupUrl": "https://share.feijipan.com/s/8I9Wq8Fm",
+  "changelog": [
+    "1. 全新 Ptr_VPN 发布。",
+    "2. 支持 7 大核心加速模块。",
+    "3. 接入真实 VPN 底层权限。",
+    "4. 适配普通账号限制与互斥逻辑。",
+    "5. 支持实时网络测速与监控。",
+    "6. 修复网络加速导致断网的问题。",
+    "7. 补全 42 个功能专属矢量图标。"
+  ],
+  "forceUpdate": false
+}
