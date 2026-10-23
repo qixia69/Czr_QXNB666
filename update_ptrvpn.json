@@ -1,15 +1,16 @@
 {
   "version": "1.0",
   "downloadUrl": "https://github.com/qixia69/Czr_QXNB666/releases/download/Ptr%E8%B5%84%E6%BA%90/Ptr_VPN_1.0.apk",
-  "backupUrl": "https://share.feijipan.com/s/8I9Wq8Fm",
+  "backupUrl": "https://share.feijipan.com/s/zfx5CXZJ",
   "changelog": [
-    "1. 全新 Ptr_VPN 发布。",
-    "2. 支持 7 大核心加速模块。",
-    "3. 接入真实 VPN 底层权限。",
-    "4. 适配普通账号限制与互斥逻辑。",
-    "5. 支持实时网络测速与监控。",
-    "6. 修复网络加速导致断网的问题。",
-    "7. 补全 42 个功能专属矢量图标。"
+    "1. 全新 Ptr_VPN 发布，支持 7 大核心加速模块。",
+    "2. 接入真实 VPN 底层权限与 SOCKS5 节点匹配。",
+    "3. 适配普通账号限制与多模块互斥逻辑。",
+    "4. 支持仪表盘实时网络上下行测速与监控。",
+    "5. 修复网络接管导致断网的问题，延迟过高自动拦截。",
+    "6. 补全全部 42 个功能专属矢量图标。",
+    "7. 优化高级全局加速，真实调用 17 个专属底层 API。",
+    "8. 增加弱网环境模拟自定义调参功能。"
   ],
   "forceUpdate": false
 }
